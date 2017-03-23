@@ -1,6 +1,7 @@
 package resource_pool
 
 import (
+	"context"
 	"time"
 )
 
@@ -24,7 +25,7 @@ type Options struct {
 
 	// This function creates a resource handle (e.g., a connection) for a
 	// resource location.  The function must be thread-safe.
-	Open func(resourceLocation string) (
+	Open func(ctx context.Context, resourceLocation string) (
 		handle interface{},
 		err error)
 
@@ -80,7 +81,7 @@ type ResourcePool interface {
 	//  2. handle.Discard()
 	//  3. pool.Release(handle)
 	//  4. pool.Discard(handle)
-	Get(key string) (ManagedHandle, error)
+	Get(ctx context.Context, key string) (ManagedHandle, error)
 
 	// This releases an active resource handle back to the resource pool.
 	Release(handle ManagedHandle) error

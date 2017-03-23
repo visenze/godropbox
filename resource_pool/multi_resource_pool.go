@@ -1,6 +1,7 @@
 package resource_pool
 
 import (
+	"context"
 	"sync"
 
 	"github.com/dropbox/godropbox/errors"
@@ -140,7 +141,7 @@ func (p *MultiResourcePool) ListRegistered() []string {
 }
 
 // See ResourcePool for documentation.
-func (p *MultiResourcePool) Get(
+func (p *MultiResourcePool) Get(ctx context.Context,
 	resourceLocation string) (ManagedHandle, error) {
 
 	pool := p.getPool(resourceLocation)
@@ -149,7 +150,7 @@ func (p *MultiResourcePool) Get(
 			"%s is not registered in the resource pool",
 			resourceLocation)
 	}
-	return pool.Get(resourceLocation)
+	return pool.Get(ctx, resourceLocation)
 }
 
 // See ResourcePool for documentation.

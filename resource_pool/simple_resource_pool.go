@@ -1,6 +1,7 @@
 package resource_pool
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"sync"
@@ -152,7 +153,7 @@ func (p *SimpleResourcePool) getLocation() (string, error) {
 // This gets an active resource from the resource pool.  Note that the
 // resourceLocation argument is ignored (The handles are associated to the
 // resource location provided by the first Register call).
-func (p *SimpleResourcePool) Get(unused string) (ManagedHandle, error) {
+func (p *SimpleResourcePool) Get(ctx context.Context, unused string) (ManagedHandle, error) {
 	activeCount := atomic.AddInt32(p.numActive, 1)
 	if p.options.MaxActiveHandles > 0 &&
 		activeCount > p.options.MaxActiveHandles {
@@ -186,7 +187,7 @@ func (p *SimpleResourcePool) Get(unused string) (ManagedHandle, error) {
 		defer p.openTokens.Release()
 	}
 
-	handle, err := p.options.Open(location)
+	handle, err := p.options.Open(ctx, location)
 	if err != nil {
 		atomic.AddInt32(p.numActive, -1)
 		return nil, OpenHandleError{p.location, err}

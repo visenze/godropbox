@@ -1,6 +1,7 @@
 package resource_pool
 
 import (
+	"context"
 	"sync"
 	"sync/atomic"
 
@@ -193,7 +194,8 @@ func (p *RoundRobinResourcePool) ListRegistered() []string {
 }
 
 // See ResourcePool for documentation.
-func (p *RoundRobinResourcePool) Get(key string) (ManagedHandle, error) {
+func (p *RoundRobinResourcePool) Get(ctx context.Context,
+	key string) (ManagedHandle, error) {
 
 	p.rwMutex.RLock()
 	defer p.rwMutex.RUnlock()
@@ -205,7 +207,7 @@ func (p *RoundRobinResourcePool) Get(key string) (ManagedHandle, error) {
 		next := int(atomic.AddInt64(p.counter, 1) % int64(len(p.pools)))
 		pool := p.pools[next].Pool
 
-		handle, err = pool.Get(key)
+		handle, err = pool.Get(ctx, key)
 		if err == nil {
 			return handle, nil
 		}
